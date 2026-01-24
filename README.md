@@ -91,7 +91,7 @@ authService-be/
 │ │ │ ├── config/ # Configuration classes
 │ │ │ ├── controller/ # REST controllers
 │ │ │ ├── dto/ # Data Transfer Objects
-│ │ │ ├── entity/ # JPA entities (User, Role, etc.)
+│ │ │ ├── domain/ # JPA entities (User, Role, etc.)
 │ │ │ ├── repository/ # Database repositories
 │ │ │ ├── service/ # Business logic
 │ │ │ ├── security/ # Security & JWT configs

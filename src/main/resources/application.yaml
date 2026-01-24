@@ -142,7 +142,7 @@ logging:
     root: ${LOGGING_LEVEL_ROOT:INFO}
     org.springframework.web: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB:INFO}
     org.hibernate.SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL:INFO}
-    com.social: ${LOGGING_LEVEL_COM_SOCIAL:DEBUG}
+    com.oneClick: ${LOGGING_LEVEL_COM_ONECLICK:DEBUG}
   pattern:
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"
 
@@ -155,3 +155,10 @@ app:
   features:
     cache-enabled: ${APP_FEATURES_CACHE_ENABLED:true}
     metrics-enabled: ${APP_FEATURES_METRICS_ENABLED:true}
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  access-token-expiration: 900000      # 15 minutes
+  refresh-token-expiration: 604800000  # 7 days
+  issuer: authService-be

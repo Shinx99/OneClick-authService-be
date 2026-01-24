@@ -66,28 +66,28 @@ docs/trung/update-readme-#20
 Format
 
 ```text
-<type>(<scope>): <subject>
+<type>(<scope>): <subject>-#{issue-id}
 ```
 
 ⚠️ LƯU Ý: KHÔNG có tên người trong commit message!
-Types
-|Type |	Khi nào dùng |	Ví dụ |
-|-----|--------------|--------|
-|feat	| Tính năng mới |	feat(profile): add user profile form |
-|fix |	Sửa bug |	fix(auth): resolve login validation bug |
-|docs |	Cập nhật | docs	docs: update API integration guide |
-|style |	Format code |	style: run prettier |
-|refactor |	Refactor code |	refactor(auth): simplify token logic |
-|test |	Tests |	test(auth): add login unit tests |
-|chore |	Maintenance |	chore: update dependencies |
+
+|Type |	Khi nào dùng | 	Ví dụ                                   |
+|-----|--------------|------------------------------------------|
+|feat	| Tính năng mới | 	feat(profile): add user profile form -#23 |
+|fix |	Sửa bug | 	fix(auth): resolve login validation bug -#7 |
+|docs |	Cập nhật | docs	docs: update API integration guide -#34 |
+|style |	Format code | 	style: run prettier -#5                 |
+|refactor |	Refactor code | 	refactor(auth): simplify token logic -#45 |
+|test |	Tests | 	test(auth): add login unit tests -#76   |
+|chore |	Maintenance | 	chore: update dependencies -#24         |
 
 **Ví dụ:**
 
 ```bash
-✅ feat(auth): add login form with validation
-✅ fix(api): handle network timeout error
-✅ docs: update troubleshooting guide
-✅ refactor(profile): extract validation logic
+✅ feat(auth): add login form with validation -#24
+✅ fix(api): handle network timeout error -#26
+✅ docs: update troubleshooting guide -#56
+✅ refactor(profile): extract validation logic -#62
 
 ❌ nam/feature(auth): add login form      # SAI - có tên người
 ❌ feature(auth): add login               # SAI - type phải ngắn
@@ -108,7 +108,7 @@ git checkout -b feat/nam/user-login-#1
 ```bash
 # Code xong một phần → commit
 git add .
-git commit -m "feat(auth): add login form UI"
+git commit -m "feat(auth): add login form UI -#24"
 ```
 ```bash
 Quy tắc commit:
@@ -204,7 +204,7 @@ Khi code:
 
 ```bash
 git add .
-git commit -m "feat(scope): description"  # KHÔNG có tên người!
+git commit -m "feat(scope): description -#45"  # KHÔNG có tên người!
 ```
 Khi push:
 
@@ -245,7 +245,7 @@ git checkout -b hotfix/trac/auth-crash-#10
 
 # 2. Fix & commit
 git add .
-git commit -m "hotfix: fix authentication crash"
+git commit -m "hotfix: fix authentication crash -#44"
 
 # 3. Merge vào main
 git checkout main

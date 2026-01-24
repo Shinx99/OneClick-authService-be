@@ -67,6 +67,7 @@ services:
       # Exclude target directory
       - /app/target
     environment:
+      - JAVA_OPTS=-Xms256m -Xmx1024m -Dspring.devtools.restart.enabled=true -Dspring.devtools.livereload.enabled=true
       # Spring profiles
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
 
@@ -82,6 +83,9 @@ services:
       # Redis (use service name 'redis')
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
+        
+      # JWT Configuration - ADD THIS
+      - JWT_SECRET=${JWT_SECRET}
 
       # JPA
       - SPRING_JPA_SHOW_SQL=${SPRING_JPA_SHOW_SQL:-true}
