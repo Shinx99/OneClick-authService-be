@@ -1,4 +1,4 @@
-package com.oneClick.authService_be.account.domain;
+package com.oneClick.authService_be.domain.account.model.aggregate;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

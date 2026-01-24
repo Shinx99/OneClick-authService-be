@@ -1,6 +1,5 @@
-package com.oneClick.authService_be.password.domain;
+package com.oneClick.authService_be.domain.account.model.aggregate;
 
-import com.oneClick.authService_be.account.domain.Account;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -11,7 +11,7 @@ RUN mvn dependency:go-offline
 EXPOSE 8080 5005
 
 # Chạy với Maven spring-boot:run để có hot reload
-CMD ["mvn", "spring-boot:run", "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
+#CMD ["mvn", "spring-boot:run", "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]
 
 
 CMD ["mvn", "spring-boot:run", \

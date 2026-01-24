@@ -97,7 +97,7 @@ authService-be/
 │   │   │       │       ├── UserResponse.java
 │   │   │       │       └── ApiResponse.java
 │   │   │       │
-│   │   │       ├── entity/           # JPA Entities (Database models)
+│   │   │       ├── domain/           # JPA Entities (Database models)
 │   │   │       │   ├── User.java                  # User entity
 │   │   │       │   ├── Role.java                  # Role entity
 │   │   │       │   ├── Candidate.java             # Candidate profile
