@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to OneClick</title>
+</head>
+<body>
+<div th:fragment="body-content">
+    <h2>Welcome to <span th:text="${companyName}">OneClick</span>, <span th:text="${username}">User</span>! 🎉</h2>
+
+    <p>Thank you for verifying your email address. Your account is now fully activated and ready to use!</p>
+
+    <p>We're thrilled to have you join our community. Here's what you can do next:</p>
+
+    <div class="info-box">
+        <h3 style="margin-top: 0; color: #667eea;">🚀 Get Started</h3>
+        <ul style="padding-left: 20px;">
+            <li><strong>Complete your profile</strong> - Add more information about yourself</li>
+            <li><strong>Explore features</strong> - Discover what you can do with your account</li>
+            <li><strong>Connect with others</strong> - Start networking and growing</li>
+        </ul>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a th:href="${dashboardUrl}" href="#" class="button">
+            📊 Go to Dashboard
+        </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>📚 Helpful Resources</h3>
+    <p>Check out these resources to get the most out of your account:</p>
+
+    <div style="display: table; width: 100%;">
+        <div style="display: table-row;">
+            <div style="display: table-cell; padding: 10px; width: 50%;">
+                <p style="margin: 0;">
+                    📖 <a th:href="${docsUrl}" href="#">Documentation</a>
+                </p>
+            </div>
+            <div style="display: table-cell; padding: 10px; width: 50%;">
+                <p style="margin: 0;">
+                    💬 <a th:href="${communityUrl}" href="#">Community Forum</a>
+                </p>
+            </div>
+        </div>
+        <div style="display: table-row;">
+            <div style="display: table-cell; padding: 10px; width: 50%;">
+                <p style="margin: 0;">
+                    🎓 <a th:href="${tutorialsUrl}" href="#">Video Tutorials</a>
+                </p>
+            </div>
+            <div style="display: table-cell; padding: 10px; width: 50%;">
+                <p style="margin: 0;">
+                    ❓ <a th:href="${faqUrl}" href="#">FAQ</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="info-box">
+        <p style="margin: 0;">
+            <strong>💬 Need Help?</strong><br/>
+            Our support team is here to help! Contact us at
+            <a th:href="'mailto:' + ${supportEmail}" th:text="${supportEmail}" href="#">support@oneclick.com</a>
+        </p>
+    </div>
+
+    <p style="margin-top: 30px;">Happy exploring! 🎊</p>
+    <p><strong>The <span th:text="${companyName}">OneClick</span> Team</strong></p>
+</div>
+</body>
+</html>

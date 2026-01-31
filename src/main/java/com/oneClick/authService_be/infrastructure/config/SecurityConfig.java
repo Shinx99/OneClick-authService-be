@@ -58,7 +58,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
                         ).permitAll()
 
                         // Auth endpoints
@@ -83,7 +86,8 @@ public class SecurityConfig {
 
                         // Test endpoints (ONLY for development)
                         .requestMatchers(
-                                "/api/test/**"
+                                "/api/test/**",
+                                "/api/dev/**"
                         ).permitAll()
 
                         // ============================================

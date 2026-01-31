@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Activated</title>
+</head>
+<body>
+<div th:fragment="body-content">
+    <h2>🎉 Your Account is Now Active!</h2>
+
+    <p>Hi <span th:text="${username}">User</span>,</p>
+
+    <p>Great news! Your <strong th:text="${companyName}">OneClick</strong> account has been successfully activated.</p>
+
+    <div class="info-box">
+        <p style="margin: 0;">
+            <strong>Account Information:</strong><br/>
+            Email: <span th:text="${email}">user@example.com</span><br/>
+            Account Type: <span th:text="${accountType}">Standard</span><br/>
+            Activated: <span th:text="${#temporals.format(activatedAt, 'dd MMMM yyyy HH:mm')}">28 January 2026 17:30</span>
+        </p>
+    </div>
+
+    <p>You can now access all features of your account.</p>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a th:href="${loginUrl}" href="#" class="button">
+            🚀 Login to Your Account
+        </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <p><strong>What's Next?</strong></p>
+    <ul style="padding-left: 20px;">
+        <li>Complete your profile to personalize your experience</li>
+        <li>Explore our features and tools</li>
+        <li>Join our community</li>
+    </ul>
+
+    <p style="margin-top: 20px;">
+        If you have any questions, feel free to reach out to our support team.
+    </p>
+</div>
+</body>
+</html>

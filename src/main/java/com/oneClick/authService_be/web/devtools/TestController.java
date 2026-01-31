@@ -1,5 +1,5 @@
 // src/main/java/com/oneClick/authService_be/web/controller/TestController.java
-package com.oneClick.authService_be.web.controller;
+package com.oneClick.authService_be.web.devtools;
 
 import com.oneClick.authService_be.infrastructure.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
