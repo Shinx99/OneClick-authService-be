@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Unusual Login Detected</title>
+</head>
+<body>
+<div th:fragment="body-content">
+    <h2>⚠️ Unusual Login Activity Detected</h2>
+
+    <p>Hi <span th:text="${username}">User</span>,</p>
+
+    <p>We detected a login to your <strong th:text="${companyName}">OneClick</strong> account from a new device or location.</p>
+
+    <div class="danger-box">
+        <h3 style="margin-top: 0; color: #dc3545;">🔐 Login Details</h3>
+        <p style="margin: 5px 0;">
+            <strong>Time:</strong> <span th:text="${#temporals.format(loginTime, 'dd MMMM yyyy HH:mm:ss z')}">28 January 2026 17:30:00 UTC</span>
+        </p>
+        <p style="margin: 5px 0;">
+            <strong>IP Address:</strong> <span th:text="${ipAddress}">192.168.1.1</span>
+        </p>
+        <p style="margin: 5px 0;">
+            <strong>Location:</strong> <span th:text="${location}">Ho Chi Minh City, Vietnam</span>
+        </p>
+        <p style="margin: 5px 0;">
+            <strong>Device:</strong> <span th:text="${deviceInfo}">Chrome on Windows</span>
+        </p>
+    </div>
+
+    <h3>Was this you?</h3>
+
+    <div style="margin: 20px 0;">
+        <p><strong>✅ If this was you:</strong></p>
+        <p style="font-size: 14px; color: #6c757d; margin-left: 20px;">
+            No action is needed. You can safely ignore this email.
+        </p>
+    </div>
+
+    <div style="margin: 20px 0;">
+        <p><strong>❌ If this wasn't you:</strong></p>
+        <p style="font-size: 14px; color: #6c757d; margin-left: 20px;">
+            Your account may have been compromised. Please secure your account immediately:
+        </p>
+        <ol style="margin-left: 40px; font-size: 14px; color: #6c757d;">
+            <li>Change your password right away</li>
+            <li>Review your recent account activity</li>
+            <li>Enable two-factor authentication</li>
+            <li>Contact our security team</li>
+        </ol>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a th:href="${changePasswordUrl}" href="#" class="button" style="background: #dc3545;">
+                🔐 Change Password Now
+            </a>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="warning-box">
+        <p style="margin: 0;">
+            <strong>🛡️ Security Recommendations:</strong>
+        </p>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            <li>Use a strong, unique password</li>
+            <li>Enable two-factor authentication (2FA)</li>
+            <li>Review authorized devices regularly</li>
+            <li>Never share your password or OTP codes</li>
+            <li>Be cautious of phishing emails</li>
+        </ul>
+    </div>
+
+    <p style="margin-top: 30px; font-size: 14px; color: #6c757d;">
+        For immediate assistance, contact our security team at
+        <a th:href="'mailto:' + ${securityEmail}" th:text="${securityEmail}" href="#">security@oneclick.com</a>
+    </p>
+</div>
+</body>
+</html>

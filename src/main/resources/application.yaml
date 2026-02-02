@@ -1,4 +1,3 @@
-
 # ============================================
 # SERVER CONFIGURATION
 # ============================================
@@ -10,6 +9,9 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json
   tomcat:
     max-threads: ${SERVER_TOMCAT_MAX_THREADS:200}
+  error:
+    include-message: always
+    include-binding-errors: always
 
 # ============================================
 # SPRING CONFIGURATION
@@ -25,12 +27,49 @@ spring:
     fail-fast: ${SPRING_CONFIG_FAIL_FAST:false}
 
   # ============================================
+  # EMAIL CONFIGURATION
+  # ============================================
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    from: ${MAIL_FROM:${MAIL_USERNAME}}
+    default-encoding: UTF-8
+    test-connection: false
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+            auth: true                    # ✅ THÊM DÒNG NÀY
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+        debug: false
+
+  # ============================================
+  # THYMELEAF CONFIGURATION
+  # ============================================
+  thymeleaf:
+    enabled: true
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+    check-template: true
+    check-template-location: true
+
+  # ============================================
   # DATASOURCE (PostgreSQL)
   # ============================================
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/authservice_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
@@ -50,29 +89,32 @@ spring:
     defer-datasource-initialization: false
     properties:
       hibernate:
-        format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:false}
+        format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:true}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc:
           batch_size: ${SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_BATCH_SIZE:20}
         order_inserts: ${SPRING_JPA_PROPERTIES_HIBERNATE_ORDER_INSERTS:true}
         order_updates: ${SPRING_JPA_PROPERTIES_HIBERNATE_ORDER_UPDATES:true}
 
   # ============================================
-  # FLYWAY MIGRATION (Added spring. prefix)
+  # FLYWAY MIGRATION
   # ============================================
   flyway:
     enabled: ${SPRING_FLYWAY_ENABLED:true}
-    baseline-on-migrate: ${SPRING_FLYWAY_BASELINE_ON_MIGRATE:false}
+    baseline-on-migrate: ${SPRING_FLYWAY_BASELINE_ON_MIGRATE:true}
     validate-on-migrate: ${SPRING_FLYWAY_VALIDATE_ON_MIGRATE:true}
     locations: ${SPRING_FLYWAY_LOCATIONS:classpath:db/migration}
     clean-disabled: ${SPRING_FLYWAY_CLEAN_DISABLED:true}
+    baseline-version: 0
 
   # ============================================
-  # REDIS (Added Redis config)
+  # REDIS (Optional - comment out if not using)
   # ============================================
   data:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
       timeout: ${SPRING_DATA_REDIS_TIMEOUT:2s}
       lettuce:
         pool:
@@ -81,18 +123,19 @@ spring:
           min-idle: ${SPRING_DATA_REDIS_LETTUCE_POOL_MIN_IDLE:0}
 
   # ============================================
-  # CACHE (Changed from NONE to redis)
+  # CACHE
   # ============================================
   cache:
-    type: ${SPRING_CACHE_TYPE:redis}
+    type: ${SPRING_CACHE_TYPE:simple}
     redis:
-      time-to-live: ${SPRING_CACHE_REDIS_TIME_TO_LIVE:3600000}  # 1 hour
+      time-to-live: ${SPRING_CACHE_REDIS_TIME_TO_LIVE:3600000}
 
   # ============================================
   # FILE UPLOAD
   # ============================================
   servlet:
     multipart:
+      enabled: true
       max-file-size: ${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE:10MB}
       max-request-size: ${SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE:50MB}
 
@@ -110,14 +153,14 @@ spring:
       port: ${SPRING_DEVTOOLS_LIVERELOAD_PORT:35729}
 
 # ============================================
-# ACTUATOR (Corrected metrics path)
+# ACTUATOR
 # ============================================
 management:
   endpoints:
     enabled-by-default: ${MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT:true}
     web:
       exposure:
-        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics}
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics,prometheus}
       base-path: ${MANAGEMENT_ENDPOINTS_WEB_BASE_PATH:/actuator}
 
   endpoint:
@@ -133,6 +176,8 @@ management:
     export:
       simple:
         enabled: ${MANAGEMENT_METRICS_EXPORT_SIMPLE_ENABLED:true}
+    tags:
+      application: ${spring.application.name}
 
 # ============================================
 # LOGGING
@@ -141,24 +186,61 @@ logging:
   level:
     root: ${LOGGING_LEVEL_ROOT:INFO}
     org.springframework.web: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB:INFO}
-    org.hibernate.SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL:INFO}
+    org.springframework.security: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY:DEBUG}
+    org.springframework.mail: DEBUG
+    org.hibernate.SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL:DEBUG}
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     com.oneClick: ${LOGGING_LEVEL_COM_ONECLICK:DEBUG}
   pattern:
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOGGING_FILE_NAME:logs/authservice.log}
+    max-size: ${LOGGING_FILE_MAX_SIZE:10MB}
+    max-history: ${LOGGING_FILE_MAX_HISTORY:30}
 
 # ============================================
 # CUSTOM APP PROPERTIES
 # ============================================
 app:
+  name: ${APP_NAME:OneClick}
   version: ${APP_VERSION:@project.version@}
   environment: ${APP_ENVIRONMENT:development}
+
+  frontend:
+    url: ${APP_FRONTEND_URL:http://localhost:3000}
+
+  logo:
+    url: ${APP_LOGO_URL:https://yourapp.com/logo.png}
+
+  support:
+    email: ${APP_SUPPORT_EMAIL:support@oneclick.com}
+
+  security:
+    email: ${APP_SECURITY_EMAIL:security@oneclick.com}
+
   features:
     cache-enabled: ${APP_FEATURES_CACHE_ENABLED:true}
     metrics-enabled: ${APP_FEATURES_METRICS_ENABLED:true}
 
-# JWT Configuration
+# ============================================
+# JWT CONFIGURATION
+# ============================================
 jwt:
-  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-  access-token-expiration: 900000      # 15 minutes
-  refresh-token-expiration: 604800000  # 7 days
-  issuer: authService-be
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900000}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
+  issuer: ${JWT_ISSUER:authService-be}
+
+# ============================================
+# SPRINGDOC / SWAGGER
+# ============================================
+springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_API_DOCS_ENABLED:true}
+    path: /api-docs
+  swagger-ui:
+    enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED:true}
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha

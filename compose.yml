@@ -87,6 +87,12 @@ services:
       # JWT Configuration - ADD THIS
       - JWT_SECRET=${JWT_SECRET}
 
+      # ✅ THÊM PHẦN NÀY - Email Configuration
+      - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+
       # JPA
       - SPRING_JPA_SHOW_SQL=${SPRING_JPA_SHOW_SQL:-true}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=${SPRING_JPA_HIBERNATE_DDL_AUTO:-validate}
