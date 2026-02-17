@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.oneClick</groupId>
-    <artifactId>authService-be</artifactId>
+    <artifactId>authService</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>authService-be</name>
     <description>authService Backend</description>
