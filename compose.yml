@@ -83,11 +83,14 @@ services:
       # Redis (use service name 'redis')
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
-        
+
+      # CORS Configuration - ADD THIS
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+
       # JWT Configuration - ADD THIS
       - JWT_SECRET=${JWT_SECRET}
 
-      # ✅ THÊM PHẦN NÀY - Email Configuration
+      # Email Configuration
       - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
       - MAIL_PORT=${MAIL_PORT:-587}
       - MAIL_USERNAME=${MAIL_USERNAME}
