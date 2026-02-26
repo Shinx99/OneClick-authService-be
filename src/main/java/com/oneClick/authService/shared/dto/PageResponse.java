@@ -22,19 +22,22 @@ public class PageResponse<T> {
     private List<T> content;
 
     @Schema(description = "Current page number (0-indexed)", example = "0")
-    private int pageNumber;
+    private Integer pageNumber;
 
     @Schema(description = "Number of items per page", example = "20")
-    private int pageSize;
+    private Integer pageSize;
 
     @Schema(description = "Total number of items", example = "100")
-    private long totalElements;
+    private Long totalElements;
 
     @Schema(description = "Total number of pages", example = "5")
-    private int totalPages;
+    private Integer totalPages;
+
+    @Schema(description = "Whether this is the first page", example = "false")
+    private Boolean first;
 
     @Schema(description = "Whether this is the last page", example = "false")
-    private boolean last;
+    private Boolean last;
 
     // Static factory method from Spring Data Page
     public static <T> PageResponse<T> from(Page<T> page) {
@@ -44,6 +47,7 @@ public class PageResponse<T> {
                 .pageSize(page.getSize())
                 .totalElements(page.getTotalElements())
                 .totalPages(page.getTotalPages())
+                .first(page.isFirst())
                 .last(page.isLast())
                 .build();
     }

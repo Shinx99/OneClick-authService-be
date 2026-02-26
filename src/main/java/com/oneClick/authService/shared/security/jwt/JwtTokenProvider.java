@@ -1,5 +1,5 @@
 // src/main/java/com/oneClick/authService_be/infrastructure/security/jwt/JwtTokenProvider.java
-package com.oneClick.authService.shared.security;
+package com.oneClick.authService.shared.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -33,13 +33,13 @@ public class JwtTokenProvider {
     /**
      * Generate access token with user info and roles
      */
-    public String generateAccessToken(String userId, String email, List<String> roles) {
-        log.debug("🔑 Generating access token for user: {}", userId);
+    public String generateAccessToken(String userId, List<String> roles) {
+        log.debug("Generating access token for user: {}", userId);
         log.debug("Secret status: {}", jwtSecret != null ? "PRESENT" : "NULL");
 
         return Jwts.builder()
                 .subject(userId)
-                .claim("email", email)
+                //.claim("email", email)
                 .claim("roles", roles)
                 .issuer(issuer)
                 .issuedAt(new Date())
@@ -67,9 +67,9 @@ public class JwtTokenProvider {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String extractEmail(String token) {
-        return extractClaim(token, claims -> claims.get("email", String.class));
-    }
+//    public String extractEmail(String token) {
+//        return extractClaim(token, claims -> claims.get("email", String.class));
+//    }
 
     @SuppressWarnings("unchecked")
     public List<String> extractRoles(String token) {
@@ -85,6 +85,12 @@ public class JwtTokenProvider {
             return false;
         }
     }
+
+    // Thêm vào JwtTokenProvider
+    public Long getAccessTokenExpiry() {
+        return accessTokenExpiration;  // ← trả về giá trị từ config (ms)
+    }
+
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());

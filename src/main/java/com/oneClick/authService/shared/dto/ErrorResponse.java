@@ -23,7 +23,7 @@ public class ErrorResponse {
     private Instant timestamp = Instant.now();
 
     @Schema(description = "HTTP status code", example = "400")
-    private int status;
+    private Integer status;
 
     @Schema(description = "Error type", example = "Bad Request")
     private String error;

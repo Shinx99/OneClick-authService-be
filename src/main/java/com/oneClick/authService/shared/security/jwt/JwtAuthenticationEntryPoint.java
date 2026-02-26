@@ -1,4 +1,4 @@
-package com.oneClick.authService.shared.security;
+package com.oneClick.authService.shared.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.Map;
 
 // infrastructure/security/handler/JwtAuthenticationEntryPoint.java
+// Handle 401 Authorize bug in a friendly way!
 @Component
 @Slf4j
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
