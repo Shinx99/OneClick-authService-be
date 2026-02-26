@@ -22,10 +22,10 @@ public class ApiResponse<T> {
     private Instant timestamp = Instant.now();
 
     @Schema(description = "HTTP status code", example = "200")
-    private int status;
+    private Integer status;
 
     @Schema(description = "Success indicator", example = "true")
-    private boolean success;
+    private Boolean success;
 
     @Schema(description = "Response message")
     private String message;

@@ -1,4 +1,4 @@
-package com.oneClick.authService.shared.security;
+package com.oneClick.authService.shared.security.jwt;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // get information from Payload
                 String userId = jwtService.extractUserId(jwt);
-                String email = jwtService.extractEmail(jwt);
+                //String email = jwtService.extractEmail(jwt);
                 List<String> roles = jwtService.extractRoles(jwt);
 
                 // Convert roles to GrantedAuthorities

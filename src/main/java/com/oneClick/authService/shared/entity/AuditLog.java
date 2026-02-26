@@ -9,6 +9,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "auth_audit_logs")
@@ -25,7 +26,7 @@ import java.time.Instant;
 public class AuditLog extends BaseAuditEntity {
 
     @Column(name = "account_id", nullable = true)
-    private Long accountId;
+    private UUID accountId;
 
     @Column(name = "event_type", nullable = false, length = 50)
     private String eventType;  // LOGIN_SUCCESS, REGISTER, PASSWORD_RESET...
@@ -41,13 +42,13 @@ public class AuditLog extends BaseAuditEntity {
     String meta;  // {"clientId": "app-mobile", "device": "iPhone14"}
 
     // Convenience methods
-    public void setCurrentUserContext(Long accountId, String ip, String userAgent) {
+    public void setCurrentUserContext(UUID accountId, String ip, String userAgent) {
         this.accountId = accountId;
         this.ip = ip;
         this.userAgent = userAgent;
     }
 
-    public static AuditLog loginSuccess(Long accountId, String ip, String userAgent) {
+    public static AuditLog loginSuccess(UUID accountId, String ip, String userAgent) {
         return AuditLog.builder()
                 .accountId(accountId)
                 .eventType("LOGIN_SUCCESS")
@@ -56,7 +57,7 @@ public class AuditLog extends BaseAuditEntity {
                 .build();
     }
 
-    public static AuditLog register(Long accountId, String ip, String userAgent) {
+    public static AuditLog register(UUID accountId, String ip, String userAgent) {
         return AuditLog.builder()
                 .accountId(accountId)
                 .eventType("ACCOUNT_REGISTERED")
