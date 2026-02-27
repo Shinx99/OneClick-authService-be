@@ -20,6 +20,7 @@ import java.util.UUID;
 )
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RefreshToken {
@@ -40,6 +41,12 @@ public class RefreshToken {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ToString.Exclude
     private Account account;
+
+    @Column(name = "token_prefix", nullable = false, length = 24)
+    private String tokenPrefix;
+
+    @Column(name = "token_hash", nullable = false, columnDefinition = "TEXT")
+    private String tokenHash;
 
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;

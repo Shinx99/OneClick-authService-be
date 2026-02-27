@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -49,18 +50,12 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Generate refresh token
+     * Generate refresh token with UUID type
      */
     public String generateRefreshToken(String userId) {
         log.debug("Generating refresh token for user: {}", userId);
 
-        return Jwts.builder()
-                .subject(userId)
-                .issuer(issuer)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
-                .signWith(getSigningKey())
-                .compact();
+        return UUID.randomUUID().toString();
     }
 
     public String extractUserId(String token) {
@@ -91,6 +86,7 @@ public class JwtTokenProvider {
         return accessTokenExpiration;  // ← trả về giá trị từ config (ms)
     }
 
+    public Long getRefreshTokenExpiry() { return refreshTokenExpiration; }
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());

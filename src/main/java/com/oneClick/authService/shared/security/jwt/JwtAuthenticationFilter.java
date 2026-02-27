@@ -1,5 +1,6 @@
 package com.oneClick.authService.shared.security.jwt;
 
+import com.oneClick.authService.shared.security.CustomUserDetail.CustomUserDetailsService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtService;
+    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -36,6 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
+        // 1. if there's no Bearer token -> skip + continue filter chain
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -44,36 +48,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = authHeader.substring(7);
 
-            if (jwt != null && jwtService.isTokenValid(jwt)) {
+            // 2. Validate token
+            if (jwtService.isTokenValid(jwt)) {
 
-                // get information from Payload
+                // 3. Get information from Payload
                 String userId = jwtService.extractUserId(jwt);
-                //String email = jwtService.extractEmail(jwt);
-                List<String> roles = jwtService.extractRoles(jwt);
 
-                // Convert roles to GrantedAuthorities
-                List<GrantedAuthority> authorities = roles.stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+                // 4. Check SecurityContext. Handle only if not have authentication in context
+                if(userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
 
-                // Create authentication token
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userId,
-                                null,
-                                authorities
+                    // 5. Check active user and not be banned
+                    // Use loadUserById instead of loadUserByUsername
+                    // Query DB at first time
+                    UserDetails userDetails = userDetailsService.loadUserById(userId);
+
+                    if(userDetails.isEnabled() && userDetails.isAccountNonLocked()){
+
+                        // 6. Create authentication from userDetails (already has ROLE_ prefix)
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails, // userPrincipal
+                                        null,
+                                        userDetails.getAuthorities()); // get from DB
+
+                        authentication.setDetails(
+                                new WebAuthenticationDetailsSource().buildDetails(request)
                         );
 
-                // Set authentication details
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                        // 7. Set in SecurityContext
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
 
-                // Set in SecurityContext
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+
             }
         } catch (JwtException e) {
             log.error("JWT validation failed: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
         filterChain.doFilter(request, response);

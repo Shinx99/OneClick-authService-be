@@ -68,12 +68,12 @@ ON CONFLICT (account_id, role_id) DO NOTHING;
 INSERT INTO auth_sessions (session_id, account_id, ip, user_agent, created_at, last_seen_at, revoked_at)
 SELECT v.session_id, a.account_id, v.ip, v.user_agent, v.created_at, v.last_seen_at, v.revoked_at
 FROM (VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid, 'admin@example.com',      '203.0.113.10'::inet,  'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',      now() - interval '2 days',  now() - interval '10 minutes', NULL::timestamptz),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'::uuid, 'candidate0@example.com', '198.51.100.20'::inet, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)',   now() - interval '1 day',   now() - interval '1 hour',     NULL::timestamptz),
-  ('dddddddd-dddd-dddd-dddd-dddddddddddd'::uuid, 'candidate1@example.com', '198.51.100.21'::inet, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)',   now() - interval '1 day',   now() - interval '2 hours',    NULL::timestamptz),
-  ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee'::uuid, 'candidate2@example.com', '198.51.100.22'::inet, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)',   now() - interval '1 day',   now() - interval '3 hours',    NULL::timestamptz),
-  ('cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid, 'candidate3@example.com', '198.51.100.23'::inet, 'curl/8.5.0',                                     now() - interval '10 days', now() - interval '9 days',     now() - interval '9 days'),
-  ('ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid, 'recruiter0@example.com', '198.51.100.30'::inet, 'Mozilla/5.0 (X11; Linux x86_64)',                now() - interval '3 days',  now() - interval '2 hours',    NULL::timestamptz)
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid, 'admin@example.com',      '203.0.113.10',  'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',      now() - interval '2 days',  now() - interval '10 minutes', NULL::timestamptz),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'::uuid, 'candidate0@example.com', '198.51.100.20', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)',   now() - interval '1 day',   now() - interval '1 hour',     NULL::timestamptz),
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd'::uuid, 'candidate1@example.com', '198.51.100.21', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)',   now() - interval '1 day',   now() - interval '2 hours',    NULL::timestamptz),
+  ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee'::uuid, 'candidate2@example.com', '198.51.100.22', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)',   now() - interval '1 day',   now() - interval '3 hours',    NULL::timestamptz),
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc'::uuid, 'candidate3@example.com', '198.51.100.23', 'curl/8.5.0',                                     now() - interval '10 days', now() - interval '9 days',     now() - interval '9 days'),
+  ('ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid, 'recruiter0@example.com', '198.51.100.30', 'Mozilla/5.0 (X11; Linux x86_64)',                now() - interval '3 days',  now() - interval '2 hours',    NULL::timestamptz)
 ) AS v(session_id, email, ip, user_agent, created_at, last_seen_at, revoked_at)
 JOIN auth_accounts a ON a.email = v.email
 ON CONFLICT (session_id) DO NOTHING;

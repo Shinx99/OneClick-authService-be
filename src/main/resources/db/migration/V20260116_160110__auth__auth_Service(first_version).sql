@@ -41,7 +41,7 @@ CREATE TABLE auth_accounts_roles (
 CREATE TABLE auth_sessions (
     session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     account_id UUID NOT NULL REFERENCES auth_accounts(account_id) ON DELETE CASCADE,
-    ip INET,
+    ip VARCHAR(100),
     user_agent TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     last_seen_at TIMESTAMPTZ,

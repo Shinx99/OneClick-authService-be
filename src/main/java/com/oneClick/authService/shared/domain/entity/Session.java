@@ -14,6 +14,7 @@ import java.util.UUID;
         name = "auth_sessions",
         indexes = @Index(name = "idx_auth_sessions_account", columnList = "account_id")
 )
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
