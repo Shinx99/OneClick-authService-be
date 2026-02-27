@@ -1,4 +1,3 @@
-// shared/entity/AuditLog.java
 package com.oneClick.authService.shared.entity;
 
 import com.oneClick.authService.shared.entity.BaseAuditEntity;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @Table(name = "auth_audit_logs")
 @AttributeOverrides({
         @AttributeOverride(name = "id", column = @Column(name = "audit_id")),
-
+        // ✅ Giữ id override, bỏ updatedAt vì BaseAuditEntity không có
 })
 @Getter
 @Setter
@@ -29,7 +28,7 @@ public class AuditLog extends BaseAuditEntity {
     private UUID accountId;
 
     @Column(name = "event_type", nullable = false, length = 50)
-    private String eventType;  // LOGIN_SUCCESS, REGISTER, PASSWORD_RESET...
+    private String eventType;  // LOGIN_SUCCESS, EMAIL_VERIFIED...
 
     @Column(name = "ip", columnDefinition = "inet")
     private String ip;
@@ -39,31 +38,67 @@ public class AuditLog extends BaseAuditEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "meta", columnDefinition = "jsonb", nullable = true)
-    String meta;  // {"clientId": "app-mobile", "device": "iPhone14"}
+    String meta;  // {"verified_at": "2026-02-26T10:00:00Z"}
 
-    // Convenience methods
+    // ================================
+    // ✅ GENERIC FACTORY METHODS
+    // ================================
+
+    /**
+     * Generic audit log cho mọi event
+     */
+    public static AuditLog logEvent(UUID accountId, String eventType, String ip, String userAgent, String meta) {
+        return AuditLog.builder()
+                .accountId(accountId)
+                .eventType(eventType)
+                .ip(ip)
+                .userAgent(userAgent)
+                .meta(meta)
+                .build();
+    }
+
+    public static AuditLog logEvent(UUID accountId, String eventType, String ip, String userAgent) {
+        return logEvent(accountId, eventType, ip, userAgent, null);
+    }
+
+    // ================================
+    // ✅ SPECIFIC EVENTS
+    // ================================
+
+    public static AuditLog emailVerified(UUID accountId, String ip, String userAgent) {
+        return logEvent(accountId, "EMAIL_VERIFIED", ip, userAgent,
+                "{\"action\": \"account_activated\"}");
+    }
+
+    public static AuditLog accountRegistered(UUID accountId, String ip, String userAgent) {
+        return logEvent(accountId, "ACCOUNT_REGISTERED", ip, userAgent,
+                "{\"status\": \"PENDING_EMAIL\"}");
+    }
+
+    public static AuditLog loginSuccess(UUID accountId, String ip, String userAgent) {
+        return logEvent(accountId, "LOGIN_SUCCESS", ip, userAgent);
+    }
+
+    public static AuditLog loginFailed(String ip, String userAgent, String reason) {
+        return logEvent(null, "LOGIN_FAILED", ip, userAgent,
+                "{\"reason\": \"" + reason + "\"}");
+    }
+
+    public static AuditLog passwordReset(UUID accountId, String ip, String userAgent) {
+        return logEvent(accountId, "PASSWORD_RESET", ip, userAgent);
+    }
+
+    public static AuditLog profileUpdated(UUID accountId, String ip, String userAgent) {
+        return logEvent(accountId, "PROFILE_UPDATED", ip, userAgent);
+    }
+
+    // ================================
+    // ✅ UTILITY METHODS
+    // ================================
+
     public void setCurrentUserContext(UUID accountId, String ip, String userAgent) {
         this.accountId = accountId;
         this.ip = ip;
         this.userAgent = userAgent;
-    }
-
-    public static AuditLog loginSuccess(UUID accountId, String ip, String userAgent) {
-        return AuditLog.builder()
-                .accountId(accountId)
-                .eventType("LOGIN_SUCCESS")
-                .ip(ip)
-                .userAgent(userAgent)
-                .build();
-    }
-
-    public static AuditLog register(UUID accountId, String ip, String userAgent) {
-        return AuditLog.builder()
-                .accountId(accountId)
-                .eventType("ACCOUNT_REGISTERED")
-                .ip(ip)
-                .userAgent(userAgent)
-                .meta("{\"status\": \"PENDING_EMAIL\"}")
-                .build();
     }
 }
