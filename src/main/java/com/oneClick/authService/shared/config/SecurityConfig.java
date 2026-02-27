@@ -77,7 +77,8 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/refresh-token",
                                 "/api/auth/forgot-password",
-                                "/api/auth/reset-password"
+                                "/api/auth/reset-password",
+                                "/api/auth/verify-email"
                         ).permitAll()
 
                         // Verification endpoints

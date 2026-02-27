@@ -6,11 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, Long> {
+public interface AccountRepository extends JpaRepository<Account, UUID> {
 
     Optional<Account> findByEmail(String email);
+
+    Optional<Account> findById(UUID id);
 
     @Query("SELECT a FROM Account a JOIN FETCH a.roles WHERE a.email = :email")
     Optional<Account> findByEmailWithRole(String email);

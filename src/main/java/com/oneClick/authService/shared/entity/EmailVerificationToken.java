@@ -19,12 +19,12 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EmailVerificationToken {
 
-    @Id  // ✅ PK chính là verify_id UUID
+    @Id
     @Column(name = "verify_id")
     UUID verifyId;
 
     @Column(name = "account_id", nullable = false)
-    Long accountId;
+    UUID accountId;
 
     @Column(name = "token_hash", nullable = false)
     String tokenHash;

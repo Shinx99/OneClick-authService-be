@@ -22,7 +22,7 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 
         <!-- ===== BỔ SUNG VERSION MỚI ===== -->
-        <springdoc.version>2.3.0</springdoc.version>
+        <springdoc.version>2.7.0</springdoc.version>
         <testcontainers.version>1.19.3</testcontainers.version>
         <hypersistence.version>3.7.0</hypersistence.version>
         <bucket4j.version>8.7.0</bucket4j.version>

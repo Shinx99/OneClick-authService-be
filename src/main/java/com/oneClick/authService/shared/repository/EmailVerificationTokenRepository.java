@@ -22,7 +22,7 @@ public interface EmailVerificationTokenRepository extends JpaRepository<EmailVer
     /**
      * Tìm token chưa dùng của account
      */
-    Optional<EmailVerificationToken> findFirstByAccountIdAndUsedAtIsNullOrderByCreatedAtDesc(Long accountId);
+    Optional<EmailVerificationToken> findFirstByAccountIdAndUsedAtIsNullOrderByCreatedAtDesc(UUID accountId);
 
     /**
      * Cleanup expired tokens (cron job)
@@ -35,5 +35,5 @@ public interface EmailVerificationTokenRepository extends JpaRepository<EmailVer
      * Count unused tokens per account (prevent spam)
      */
     @Query("SELECT COUNT(t) FROM EmailVerificationToken t WHERE t.accountId = :accountId AND t.usedAt IS NULL")
-    long countUnusedTokensByAccountId(@Param("accountId") Long accountId);
+    long countUnusedTokensByAccountId(@Param("accountId") UUID accountId);
 }
