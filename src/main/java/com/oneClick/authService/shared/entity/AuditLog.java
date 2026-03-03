@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.net.InetAddress;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class AuditLog extends BaseAuditEntity {
     private String eventType;  // LOGIN_SUCCESS, EMAIL_VERIFIED...
 
     @Column(name = "ip", columnDefinition = "inet")
-    private String ip;
+    private InetAddress ip;
 
     @Column(name = "user_agent", columnDefinition = "text")
     private String userAgent;
@@ -47,7 +48,7 @@ public class AuditLog extends BaseAuditEntity {
     /**
      * Generic audit log cho mọi event
      */
-    public static AuditLog logEvent(UUID accountId, String eventType, String ip, String userAgent, String meta) {
+    public static AuditLog logEvent(UUID accountId, String eventType, InetAddress ip, String userAgent, String meta) {
         return AuditLog.builder()
                 .accountId(accountId)
                 .eventType(eventType)
@@ -57,7 +58,7 @@ public class AuditLog extends BaseAuditEntity {
                 .build();
     }
 
-    public static AuditLog logEvent(UUID accountId, String eventType, String ip, String userAgent) {
+    public static AuditLog logEvent(UUID accountId, String eventType, InetAddress ip, String userAgent) {
         return logEvent(accountId, eventType, ip, userAgent, null);
     }
 
@@ -65,30 +66,30 @@ public class AuditLog extends BaseAuditEntity {
     // ✅ SPECIFIC EVENTS
     // ================================
 
-    public static AuditLog emailVerified(UUID accountId, String ip, String userAgent) {
+    public static AuditLog emailVerified(UUID accountId, InetAddress ip, String userAgent) {
         return logEvent(accountId, "EMAIL_VERIFIED", ip, userAgent,
                 "{\"action\": \"account_activated\"}");
     }
 
-    public static AuditLog accountRegistered(UUID accountId, String ip, String userAgent) {
+    public static AuditLog accountRegistered(UUID accountId, InetAddress ip, String userAgent) {
         return logEvent(accountId, "ACCOUNT_REGISTERED", ip, userAgent,
                 "{\"status\": \"PENDING_EMAIL\"}");
     }
 
-    public static AuditLog loginSuccess(UUID accountId, String ip, String userAgent) {
+    public static AuditLog loginSuccess(UUID accountId, InetAddress ip, String userAgent) {
         return logEvent(accountId, "LOGIN_SUCCESS", ip, userAgent);
     }
 
-    public static AuditLog loginFailed(String ip, String userAgent, String reason) {
+    public static AuditLog loginFailed(InetAddress ip, String userAgent, String reason) {
         return logEvent(null, "LOGIN_FAILED", ip, userAgent,
                 "{\"reason\": \"" + reason + "\"}");
     }
 
-    public static AuditLog passwordReset(UUID accountId, String ip, String userAgent) {
+    public static AuditLog passwordReset(UUID accountId, InetAddress ip, String userAgent) {
         return logEvent(accountId, "PASSWORD_RESET", ip, userAgent);
     }
 
-    public static AuditLog profileUpdated(UUID accountId, String ip, String userAgent) {
+    public static AuditLog profileUpdated(UUID accountId, InetAddress ip, String userAgent) {
         return logEvent(accountId, "PROFILE_UPDATED", ip, userAgent);
     }
 
@@ -96,7 +97,7 @@ public class AuditLog extends BaseAuditEntity {
     // ✅ UTILITY METHODS
     // ================================
 
-    public void setCurrentUserContext(UUID accountId, String ip, String userAgent) {
+    public void setCurrentUserContext(UUID accountId, InetAddress ip, String userAgent) {
         this.accountId = accountId;
         this.ip = ip;
         this.userAgent = userAgent;

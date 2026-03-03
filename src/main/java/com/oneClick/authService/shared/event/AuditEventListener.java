@@ -9,6 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.net.InetAddress;
 
 @Component
 @RequiredArgsConstructor
@@ -19,13 +23,14 @@ public class AuditEventListener {
 
     // Generic listener cho tất cả audit events
     @Async("taskExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @EventListener
     public void handleAuditEvent(AuditEvent event) {
         try {
             AuditLog auditLog = AuditLog.logEvent(
                     event.getAccountId(),
                     event.getEventType(),
-                    event.getIp(),
+                    InetAddress.getByName(event.getIp()),
                     event.getUserAgent(),
                     event.getMeta()
             );
@@ -35,6 +40,8 @@ public class AuditEventListener {
             log.error("Failed to log audit event: {}", event.getEventType(), e);
         }
     }
+
+
 }
 
 

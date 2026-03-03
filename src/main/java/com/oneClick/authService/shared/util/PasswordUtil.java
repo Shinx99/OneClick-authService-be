@@ -2,6 +2,7 @@ package com.oneClick.authService.shared.util;
 
 import com.oneClick.authService.shared.exception.ValidationException;
 import lombok.experimental.UtilityClass;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -263,6 +264,13 @@ public class PasswordUtil {
         }catch (NoSuchAlgorithmException e){
             throw new RuntimeException("SHA-256 unavailable", e);
         }
+    }
+
+    /**
+     * Hash Argon2/BCrypt
+     */
+    public static String hashPassword(String plainPassword) {
+        return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));  // Argon2/BCrypt
     }
 
     /**
