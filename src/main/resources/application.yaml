@@ -223,6 +223,9 @@ app:
     cache-enabled: ${APP_FEATURES_CACHE_ENABLED:true}
     metrics-enabled: ${APP_FEATURES_METRICS_ENABLED:true}
 
+  cookie:
+    secure: ${APP_COOKIE_SECURE:false}
+
 # ============================================
 # JWT CONFIGURATION
 # ============================================
