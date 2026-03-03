@@ -1,5 +1,6 @@
 package com.oneClick.authService.shared.domain.entity;
 
+import com.oneClick.authService.shared.util.PasswordUtil;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -56,5 +57,12 @@ public class Account {
     )
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
+
+    public void setPasswordCredential(String plainPassword){
+        this.passwordCredential = PasswordCredential.builder()
+                .account(this)
+                .passwordHash(PasswordUtil.hashPassword(plainPassword))
+                .build();
+    }
 
 }

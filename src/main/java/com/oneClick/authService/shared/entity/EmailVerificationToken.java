@@ -20,6 +20,7 @@ import java.util.UUID;
 public class EmailVerificationToken {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "verify_id")
     UUID verifyId;
 
