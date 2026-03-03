@@ -55,10 +55,5 @@ public class RefreshToken {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(name = "rotated_at")
-    private Instant rotatedAt;
-
-    @Column(name = "revoked_at")
-    private Instant revokedAt;
 
 }

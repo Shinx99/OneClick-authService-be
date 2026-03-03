@@ -13,13 +13,17 @@ import com.oneClick.authService.shared.domain.repository.SessionRepository;
 import com.oneClick.authService.shared.dto.ApiResponse;
 import com.oneClick.authService.shared.exception.ResourceNotFoundException;
 import com.oneClick.authService.shared.security.jwt.JwtTokenProvider;
+import com.oneClick.authService.shared.util.TokenHashUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -33,13 +37,16 @@ public class LoginHandler {
 
     private final AuthenticationManager authenticationManager;
     private final AccountRepository accountRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final TokenHashUtil tokenHashUtil;
     private final JwtTokenProvider jwtTokenProvider;
     private final SessionRepository sessionRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final LoginMapper loginMapper;
 
-    public ApiResponse<LoginResponse> login(LoginRequest request, HttpServletRequest httpRequest){
+    @Value("${app.cookie.secure:false}")
+    private boolean secureCookie;
+
+    public ApiResponse<LoginResponse> login(LoginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse){
 
         // 1. Verify credentials
         authenticationManager.authenticate(
@@ -76,12 +83,22 @@ public class LoginHandler {
                         .session(session)
                         .account(account)
                         .tokenPrefix(rawRefreshToken.substring(0, 8))
-                        .tokenHash(passwordEncoder.encode(rawRefreshToken))
+                        .tokenHash(tokenHashUtil.hash(rawRefreshToken))
                         .expiresAt(Instant.now().plusMillis(jwtTokenProvider.getRefreshTokenExpiry()))
                 .build());
 
+        // 7. Set refresh token into httpOnly cookie
+        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", rawRefreshToken)
+                .httpOnly(true)
+                .secure(secureCookie)
+                .sameSite("Strict")
+                .path("/api/auth")
+                .maxAge(jwtTokenProvider.getRefreshTokenExpiry() / 1000)
+                .build();
+        httpResponse.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+
         // 7. Build response
-        LoginResponse response = loginMapper.toLoginResponse(account, session, accessToken, rawRefreshToken, jwtTokenProvider.getAccessTokenExpiry());
+        LoginResponse response = loginMapper.toLoginResponse(account, session, accessToken, jwtTokenProvider.getAccessTokenExpiry());
 
         return ApiResponse.<LoginResponse>builder()
                 .success(true)

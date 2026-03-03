@@ -20,11 +20,10 @@ public interface LoginMapper {
     @Mapping(target = "emailVerifiedAt", ignore = true)
     @Mapping(target = "roles", source = "account.roles")
     @Mapping(target = "accessToken", source = "accessToken")
-    @Mapping(target = "refreshToken", source = "refreshToken")
     @Mapping(target = "tokenType", constant = "Bearer")
     @Mapping(target = "expiresIn", source = "expiresIn")
     @Mapping(target = "sessionId", source = "session.sessionId")
-    LoginResponse toLoginResponse(Account account, Session session, String accessToken, String refreshToken, Long expiresIn);
+    LoginResponse toLoginResponse(Account account, Session session, String accessToken, Long expiresIn);
 
     @Named("instantToBoolean")
     default Boolean instantToBoolean(Instant value){
