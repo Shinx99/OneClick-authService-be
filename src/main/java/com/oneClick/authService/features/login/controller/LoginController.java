@@ -3,6 +3,7 @@ package com.oneClick.authService.features.login.controller;
 import com.oneClick.authService.features.login.dto.request.LoginRequest;
 import com.oneClick.authService.features.login.dto.response.LoginResponse;
 import com.oneClick.authService.features.login.handler.LoginHandler;
+import com.oneClick.authService.shared.audit.AuditContext;
 import com.oneClick.authService.shared.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -24,7 +25,19 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest){
-        return ResponseEntity.ok(loginHandler.login(request, httpRequest));
+
+        ApiResponse<LoginResponse> response = loginHandler.login(request,httpRequest);
+
+        log.debug("LoginController DEBUG - response.data.accountId = {}",
+                response.getData() != null ? response.getData().getAccountId() : "NULL DATA");
+
+        if(response != null && response.getData() != null && response.getData().getAccountId() != null){
+            AuditContext.setCurrentAccountId(response.getData().getAccountId());
+            log.debug("LoginController set AuditContext accountId: {}", response.getData().getAccountId());
+        }
+
+        return ResponseEntity.ok(response);
+        //return ResponseEntity.ok(loginHandler.login(request, httpRequest));
     }
 
 }

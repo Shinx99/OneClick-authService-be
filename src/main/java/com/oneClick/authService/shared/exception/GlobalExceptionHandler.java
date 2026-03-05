@@ -2,6 +2,7 @@ package com.oneClick.authService.shared.exception;
 
 import com.oneClick.authService.shared.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,9 @@ import java.util.Map;
  */
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
 
     /**
      * Handle BusinessException and its subclasses
@@ -34,6 +37,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
 
         log.error("Business exception: {}", ex.getMessage(), ex);
+
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(Instant.now())
@@ -98,6 +102,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
 
         log.warn("Validation failed: {}", ex.getMessage());
+
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
@@ -264,4 +269,31 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
+
+    /**
+     * Global for audit logs
+     */
+    /*private void auditException(Exception ex, HttpServletRequest request, String eventType) {
+        // ✅ SYNC publish cho FAIL (BEFORE_COMPLETION catch)
+        String ip = request.getRemoteAddr();
+        String meta = String.format("{\"error\":\"%s\",\"code\":\"%s\"}", ex.getMessage(), getErrorCode(ex));
+        String path = request.getRequestURI();
+        if (path.contains("/register") || path.contains("/signup")) {
+            eventType = "REGISTER_FAIL";
+        }
+
+        eventPublisher.publishEvent(new ApiErrorAuditEvent(ip, request.getHeader("User-Agent"), meta, eventType));
+    }
+
+
+
+    private String getErrorCode(Exception ex) {
+        if (ex instanceof BusinessException businessEx) {
+            return businessEx.getErrorCode();
+        }
+        return "UNKNOWN";
+    }*/
+
+
+
 }

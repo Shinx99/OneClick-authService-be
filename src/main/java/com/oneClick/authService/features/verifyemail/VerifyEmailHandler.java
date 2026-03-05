@@ -2,6 +2,7 @@ package com.oneClick.authService.features.verifyemail;
 
 import com.oneClick.authService.features.verifyemail.dto.VerifyEmailRequest;
 import com.oneClick.authService.features.verifyemail.dto.VerifyEmailResponse;
+import com.oneClick.authService.shared.audit.AuditContext;
 import com.oneClick.authService.shared.domain.repository.AccountRepository;
 import com.oneClick.authService.shared.entity.AccountStatus;
 import com.oneClick.authService.shared.exception.BusinessException;
@@ -10,10 +11,8 @@ import com.oneClick.authService.shared.notification.EmailService;
 import com.oneClick.authService.shared.repository.AuditLogRepository;
 import com.oneClick.authService.shared.repository.EmailVerificationTokenRepository;
 import com.oneClick.authService.shared.util.PasswordUtil;
-import com.oneClick.authService.features.verifyemail.EmailVerifiedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,6 @@ public class VerifyEmailHandler {
     private final EmailVerificationTokenRepository tokenRepo;
     private final AccountRepository accountRepo;
     private final EmailService emailService;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public VerifyEmailResponse handle(VerifyEmailRequest request, String ip, String userAgent){
@@ -73,12 +71,8 @@ public class VerifyEmailHandler {
         //4. Notifications email làm username
         emailService.sendWelcomeEmail(account.getEmail(), account.getEmail());
 
-        eventPublisher.publishEvent(new EmailVerifiedEvent(
-                account.getAccountId(),
-                ip,
-                userAgent,
-                "{\"verified_at\": \"" + Instant.now() + "\"}"
-        ));
+        AuditContext.setCurrentAccountId(account.getAccountId());
+
 
         return new VerifyEmailResponse(account.getAccountId(), "Email verified successfully");
     }
