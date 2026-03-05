@@ -40,5 +40,4 @@ public class LoginController {
         return ResponseEntity.ok(response);
         //return ResponseEntity.ok(loginHandler.login(request, httpRequest));
     }
-
 }
