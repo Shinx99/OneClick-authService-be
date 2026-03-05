@@ -18,16 +18,8 @@ import java.util.UUID;
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
 
-    // Revoke refresh token for 1 particular session
-    @Modifying
-    @Transactional
-    @Query("UPDATE RefreshToken r SET r.revokedAt = :now WHERE r.session.sessionId = :sessionId AND r.revokedAt IS NULL")
-    int revokedAllBySessionId(@Param("sessionId") UUID sessionId, @Param("now") Instant now);
+    // Find Token Hash
+    Optional<RefreshToken> findByTokenHash(String tokenHash);
 
-    // Revoke refresh token for 1 particular account
-    @Modifying
-    @Transactional
-    @Query("UPDATE RefreshToken r SET r.revokedAt = :now WHERE r.account.accountId = :accountId AND r.revokedAt IS NULL")
-    int revokedAllByAccountId(@Param("accountId") UUID accountId, @Param("now") Instant now);
 
 }

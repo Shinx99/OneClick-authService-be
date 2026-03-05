@@ -6,6 +6,7 @@ import com.oneClick.authService.features.login.handler.LoginHandler;
 import com.oneClick.authService.shared.audit.AuditContext;
 import com.oneClick.authService.shared.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
