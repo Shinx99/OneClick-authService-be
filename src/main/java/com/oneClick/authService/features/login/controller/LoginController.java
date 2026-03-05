@@ -27,5 +27,4 @@ public class LoginController {
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse){
         return ResponseEntity.ok(loginHandler.login(request, httpRequest, httpResponse));
     }
-
 }
