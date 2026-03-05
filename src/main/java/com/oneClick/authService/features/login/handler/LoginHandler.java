@@ -3,6 +3,7 @@ package com.oneClick.authService.features.login.handler;
 import com.oneClick.authService.features.login.dto.request.LoginRequest;
 import com.oneClick.authService.features.login.dto.response.LoginResponse;
 import com.oneClick.authService.features.login.mapper.LoginMapper;
+import com.oneClick.authService.shared.audit.AuditContext;
 import com.oneClick.authService.shared.domain.entity.Account;
 import com.oneClick.authService.shared.domain.entity.RefreshToken;
 import com.oneClick.authService.shared.domain.entity.Role;
@@ -99,6 +100,7 @@ public class LoginHandler {
 
         // 7. Build response
         LoginResponse response = loginMapper.toLoginResponse(account, session, accessToken, jwtTokenProvider.getAccessTokenExpiry());
+
 
         return ApiResponse.<LoginResponse>builder()
                 .success(true)
