@@ -3,6 +3,7 @@ package com.oneClick.authService.features.register;
 import com.oneClick.authService.features.register.dto.RegisterRequest;
 import com.oneClick.authService.features.register.dto.RegisterResponse;
 import com.oneClick.authService.shared.audit.AuditContext;
+import com.oneClick.authService.shared.audit.AuditContextHolder;
 import com.oneClick.authService.shared.domain.entity.Account;
 import com.oneClick.authService.shared.domain.entity.Role;
 import com.oneClick.authService.shared.domain.repository.AccountRepository;
@@ -74,7 +75,7 @@ public class RegisterHandler {
         );
         tokenRepository.save(token);
 
-        AuditContext.setCurrentAccountId(account.getAccountId());
+        AuditContextHolder.setCurrentAccountId(account.getAccountId());
 
 
         //4. Send email 1: verify link

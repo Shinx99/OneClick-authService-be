@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -122,6 +123,13 @@ public class RefreshTokenHandler {
                 .message("Logout successfully")
                 .data(null)
                 .build();
+    }
+
+    public UUID getAccountIdByRefreshToken(String rawRefreshToken) {
+        String tokenHash = tokenHashUtil.hash(rawRefreshToken);
+        return refreshTokenRepository.findByTokenHash(tokenHash)
+                .map(rt -> rt.getAccount().getAccountId())  // ← DB có account_id!
+                .orElse(null);
     }
 
 

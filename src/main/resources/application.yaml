@@ -26,6 +26,9 @@ spring:
   config:
     fail-fast: ${SPRING_CONFIG_FAIL_FAST:false}
 
+  main:
+    allow-bean-definition-overriding: true
+
   # ============================================
   # EMAIL CONFIGURATION
   # ============================================
@@ -115,12 +118,18 @@ spring:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: ${SPRING_DATA_REDIS_PORT:6379}
       password: ${SPRING_DATA_REDIS_PASSWORD:}
-      timeout: ${SPRING_DATA_REDIS_TIMEOUT:2s}
+      timeout: ${SPRING_DATA_REDIS_TIMEOUT:10s}
       lettuce:
         pool:
           max-active: ${SPRING_DATA_REDIS_LETTUCE_POOL_MAX_ACTIVE:8}
           max-idle: ${SPRING_DATA_REDIS_LETTUCE_POOL_MAX_IDLE:8}
           min-idle: ${SPRING_DATA_REDIS_LETTUCE_POOL_MIN_IDLE:0}
+
+#  session:
+#    store-type: redis
+#    timeout: 3600s  # 1h
+#    redis:
+#      namespace: oneclick:sessions
 
   # ============================================
   # CACHE
@@ -191,6 +200,7 @@ logging:
     org.hibernate.SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL:DEBUG}
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     com.oneClick: ${LOGGING_LEVEL_COM_ONECLICK:DEBUG}
+    com.oneClick.authService.shared.security.jwt: DEBUG
   pattern:
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
