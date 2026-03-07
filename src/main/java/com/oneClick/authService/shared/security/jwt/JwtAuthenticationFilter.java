@@ -1,5 +1,6 @@
 package com.oneClick.authService.shared.security.jwt;
 
+import com.oneClick.authService.shared.audit.AuditContextHolder;
 import com.oneClick.authService.shared.security.CustomUserDetail.CustomUserDetailsService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -19,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 // infrastructure/security/jwt/JwtAuthenticationFilter.java
@@ -77,6 +79,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                         // 7. Set in SecurityContext
                         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                        UUID accountId = UUID.fromString(jwtService.extractUserId(jwt));
+                        log.debug("get account id: {}", accountId);
+                        AuditContextHolder.setCurrentAccountId(accountId);     //set accountId for auditContextHolder
+
+
                     }
                 }
 
