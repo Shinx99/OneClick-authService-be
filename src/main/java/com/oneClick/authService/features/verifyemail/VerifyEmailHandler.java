@@ -3,6 +3,7 @@ package com.oneClick.authService.features.verifyemail;
 import com.oneClick.authService.features.verifyemail.dto.VerifyEmailRequest;
 import com.oneClick.authService.features.verifyemail.dto.VerifyEmailResponse;
 import com.oneClick.authService.shared.audit.AuditContext;
+import com.oneClick.authService.shared.audit.AuditContextHolder;
 import com.oneClick.authService.shared.domain.repository.AccountRepository;
 import com.oneClick.authService.shared.entity.AccountStatus;
 import com.oneClick.authService.shared.exception.BusinessException;
@@ -71,10 +72,18 @@ public class VerifyEmailHandler {
         //4. Notifications email làm username
         emailService.sendWelcomeEmail(account.getEmail(), account.getEmail());
 
-        AuditContext.setCurrentAccountId(account.getAccountId());
+        //AuditContextHolder.setCurrentAccountId(account.getAccountId());
 
 
         return new VerifyEmailResponse(account.getAccountId(), "Email verified successfully");
+    }
+
+    public UUID getAccountIdByVerifyToken(String rawToken) {
+        String tokenHash = PasswordUtil.sha256(rawToken.trim());  // ← Đồng bộ với handle()
+        return tokenRepo.findByTokenHash(tokenHash)  // tokenRepo thay vì emailVerifyTokenRepository
+                .filter(token -> !token.getExpiresAt().isBefore(Instant.now()))
+                .map(token -> token.getAccountId())
+                .orElse(null);
     }
 
 

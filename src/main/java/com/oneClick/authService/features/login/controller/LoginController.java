@@ -4,9 +4,11 @@ import com.oneClick.authService.features.login.dto.request.LoginRequest;
 import com.oneClick.authService.features.login.dto.response.LoginResponse;
 import com.oneClick.authService.features.login.handler.LoginHandler;
 import com.oneClick.authService.shared.audit.AuditContext;
+import com.oneClick.authService.shared.audit.AuditContextHolder;
 import com.oneClick.authService.shared.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +34,10 @@ public class LoginController {
         log.debug("LoginController DEBUG - response.data.accountId = {}",
                 response.getData() != null ? response.getData().getAccountId() : "NULL DATA");
 
+/*        HttpSession session = httpRequest.getSession(true); //save accountId redis for auditLog
+        session.setAttribute("CURRENT_ACCOUNT_ID", response.getData().getAccountId());*/
         if(response != null && response.getData() != null && response.getData().getAccountId() != null){
-            AuditContext.setCurrentAccountId(response.getData().getAccountId());
+            AuditContextHolder.setCurrentAccountId(response.getData().getAccountId());
             log.debug("LoginController set AuditContext accountId: {}", response.getData().getAccountId());
         }
 
