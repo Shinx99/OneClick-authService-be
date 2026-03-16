@@ -53,12 +53,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ${APP_NAME:-authService-be}-app
+    container_name: authService-be-app
     ports:
-      - "8080:8080"
+      - "8081:8080"
       - "5005:5005"      # Debug port
       - "35729:35729"    # LiveReload port
     volumes:
+      # Jwt keys
+      - ./keys/private.pem:/app/keys/private.pem:ro
+      - ./keys/public.pem:/app/keys/public.pem:ro
       # Bind mount source code for hot reload
       - ./src:/app/src:cached
       - ./pom.xml:/app/pom.xml:cached
@@ -86,9 +89,13 @@ services:
 
       # CORS Configuration - ADD THIS
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,PATCH,OPTIONS
+      - CORS_ALLOWED_HEADERS=*
+      - CORS_ALLOW_CREDENTIALS=true
+      - CORS_MAX_AGE=3600
 
       # JWT Configuration - ADD THIS
-      - JWT_SECRET=${JWT_SECRET}
+      #- JWT_SECRET=${JWT_SECRET}
 
       # Email Configuration
       - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
@@ -106,6 +113,16 @@ services:
       # Logging
       - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT:-INFO}
       - LOGGING_LEVEL_COM_SOCIAL=${LOGGING_LEVEL_COM_SOCIAL:-DEBUG}
+
+      # Eureka
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED=false
+      # App name cho Eureka
+      - SPRING_APPLICATION_NAME=authService-be
+
+      # Swagger
+      - SPRINGDOC_SWAGGER_UI_ENABLED=true
+      - SPRINGDOC_SWAGGER_UI_PATH=swagger-ui.html
 
     depends_on:
       postgres:
@@ -132,4 +149,7 @@ volumes:
 # ============================================
 networks:
   app-network:
-    driver: bridge
+      name: oneclick-network
+      external: true
+
+

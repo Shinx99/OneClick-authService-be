@@ -1,3 +1,4 @@
+/*
 package com.oneClick.authService.shared.security.jwt;
 
 import com.oneClick.authService.shared.audit.AuditContextHolder;
@@ -98,3 +99,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+*/

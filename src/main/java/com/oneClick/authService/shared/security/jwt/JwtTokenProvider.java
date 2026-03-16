@@ -1,26 +1,23 @@
-// src/main/java/com/oneClick/authService_be/infrastructure/security/jwt/JwtTokenProvider.java
 package com.oneClick.authService.shared.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.io.Decoders;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final JwtEncoder jwtEncoder;
+    private final JwtDecoder jwtDecoder;  // Thêm để parse/validate
 
     @Value("${jwt.access-token-expiration}")
     private Long accessTokenExpiration;
@@ -32,88 +29,76 @@ public class JwtTokenProvider {
     private String issuer;
 
     /**
-     * Generate access token with user info and roles
+     * Generate RS256 access token với claims
      */
     public String generateAccessToken(String userId, List<String> roles) {
-        log.debug("Generating access token for user: {}", userId);
-        log.debug("Secret status: {}", jwtSecret != null ? "PRESENT" : "NULL");
+        log.debug("Generating RS256 access token for user: {}", userId);
 
-        return Jwts.builder()
-                .subject(userId)
-                //.claim("email", email)
-                .claim("roles", roles)
+        Instant now = Instant.now();
+        Instant expiresAt = now.plusMillis(accessTokenExpiration);
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(issuer)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
-                .signWith(getSigningKey())
-                .compact();
+                .subject(userId)
+                .issuedAt(now)
+                .expiresAt(expiresAt)
+                .claim("roles", roles)
+                .build();
+
+        JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256)
+                .keyId("auth-key")
+                .build();
+
+        JwtEncoderParameters params = JwtEncoderParameters.from(header, claims);
+
+
+        return jwtEncoder.encode(params).getTokenValue();
     }
 
     /**
-     * Generate refresh token with UUID type
+     * Generate refresh token UUID
      */
     public String generateRefreshToken(String userId) {
         log.debug("Generating refresh token for user: {}", userId);
-
         return UUID.randomUUID().toString();
     }
 
+    /**
+     * Extract userId (subject)
+     */
     public String extractUserId(String token) {
-        return extractClaim(token, Claims::getSubject);
+        Jwt jwt = jwtDecoder.decode(token);
+        return jwt.getSubject();
     }
 
-//    public String extractEmail(String token) {
-//        return extractClaim(token, claims -> claims.get("email", String.class));
-//    }
-
+    /**
+     * Extract roles
+     */
     @SuppressWarnings("unchecked")
     public List<String> extractRoles(String token) {
-        return extractClaim(token, claims -> claims.get("roles", List.class));
+        Jwt jwt = jwtDecoder.decode(token);
+        return (List<String>) jwt.getClaimAsStringList("roles");
     }
 
+    /**
+     * Validate token
+     */
     public boolean isTokenValid(String token) {
         try {
-            extractAllClaims(token);
-            return !isTokenExpired(token);
+            Jwt jwt = jwtDecoder.decode(token);
+            Instant expiresAt = jwt.getExpiresAt();
+            return expiresAt != null && expiresAt.isAfter(Instant.now());
         } catch (Exception e) {
             log.error("Token validation failed: {}", e.getMessage());
             return false;
         }
     }
 
-    // Thêm vào JwtTokenProvider
     public Long getAccessTokenExpiry() {
-        return accessTokenExpiration;  // ← trả về giá trị từ config (ms)
+        return accessTokenExpiration;
     }
 
-    public Long getRefreshTokenExpiry() { return refreshTokenExpiration; }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
-
-    private SecretKey getSigningKey() {
-        if (jwtSecret == null || jwtSecret.isEmpty()) {
-            throw new IllegalStateException("JWT secret is not configured!");
-        }
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        return Keys.hmacShaKeyFor(keyBytes);
+    public Long getRefreshTokenExpiry() {
+        return refreshTokenExpiration;
     }
 }

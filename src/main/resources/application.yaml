@@ -17,6 +17,11 @@ server:
 # SPRING CONFIGURATION
 # ============================================
 spring:
+
+  cloud:
+    compatibility-verifier:
+      enabled: false
+
   application:
     name: ${APP_NAME:authService-be}
 
@@ -70,7 +75,7 @@ spring:
   # DATASOURCE (PostgreSQL)
   # ============================================
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/authservice_db}
+    url: ${SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/oneClick_auth_db}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -86,6 +91,7 @@ spring:
   # JPA & HIBERNATE
   # ============================================
   jpa:
+    open-in-view: false   # war error N+1 queries
     show-sql: ${SPRING_JPA_SHOW_SQL:false}
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
@@ -115,7 +121,7 @@ spring:
   # ============================================
   data:
     redis:
-      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      host: ${SPRING_DATA_REDIS_HOST:redis}
       port: ${SPRING_DATA_REDIS_PORT:6379}
       password: ${SPRING_DATA_REDIS_PASSWORD:}
       timeout: ${SPRING_DATA_REDIS_TIMEOUT:10s}
@@ -169,7 +175,7 @@ management:
     enabled-by-default: ${MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT:true}
     web:
       exposure:
-        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics,prometheus}
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,metrics,prometheus,eureka}
       base-path: ${MANAGEMENT_ENDPOINTS_WEB_BASE_PATH:/actuator}
 
   endpoint:
@@ -199,8 +205,7 @@ logging:
     org.springframework.mail: DEBUG
     org.hibernate.SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL:DEBUG}
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    com.oneClick: ${LOGGING_LEVEL_COM_ONECLICK:DEBUG}
-    com.oneClick.authService.shared.security.jwt: DEBUG
+    com.oneClick: ${LOGGING_LEVEL_COM_AUTH:DEBUG}
   pattern:
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
@@ -240,10 +245,14 @@ app:
 # JWT CONFIGURATION
 # ============================================
 jwt:
-  secret: ${JWT_SECRET}
+  private-key-path: /app/keys/private.pem
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900000}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
   issuer: ${JWT_ISSUER:authService-be}
+#  secret: ${JWT_SECRET}
+#  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900000}
+#  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
+#  issuer: ${JWT_ISSUER:authService-be}
 
 # ============================================
 # SPRINGDOC / SWAGGER
@@ -251,7 +260,7 @@ jwt:
 springdoc:
   api-docs:
     enabled: ${SPRINGDOC_API_DOCS_ENABLED:true}
-    path: /api-docs
+    path: /v3/api-docs
   swagger-ui:
     enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED:true}
     path: /swagger-ui.html
@@ -262,13 +271,24 @@ springdoc:
 # CORS CONFIGURATION
 # ============================================
 cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
-  allowed-methods:
-    - GET
-    - POST
-    - PUT
-    - DELETE
-    - OPTIONS
-  allowed-headers: "*"
-  allow-credentials: true
-  max-age: 3600
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8081,http://localhost:3000,http://localhost:8080}
+  allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,PATCH,OPTIONS}
+  allowed-headers: ${CORS_ALLOWED_HEADERS:*}
+  allow-credentials: ${CORS_ALLOW_CREDENTIALS:true}
+  max-age: ${CORS_MAX_AGE:3600}
+
+# ===== EUREKA CLIENT =====
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://eureka-server:8761/eureka/}
+    enabled: true  # Register với Eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+    metadata-map:
+      startup: ${random.int}
