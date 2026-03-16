@@ -19,7 +19,7 @@ public class OpenApiConfig {
     
     @Value("${spring.application.name}")
     private String applicationName;
-    
+
     @Value("${server.port}")
     private String serverPort;
 
@@ -40,11 +40,13 @@ public class OpenApiConfig {
                                 .url("https://opensource.org/licenses/MIT")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:" + serverPort)
-                                .description("Local Development Server"),
+                                .url("http://localhost:8081")  // ← Host port FIXED
+                                .description("Docker Host Dev Server"),
                         new Server()
-                                .url("https://api.oneclick.com")
-                                .description("Production Server")))
+                                .url("http://localhost:8080")
+                                .description("Direct Container"),  // local
+                        new Server().url("/auth").description("Gateway Route")  // gateway path(docs)
+                ))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,

@@ -3,7 +3,8 @@ package com.oneClick.authService.shared.config;
 import com.oneClick.authService.shared.security.CustomAccessDeniedHandler;
 import com.oneClick.authService.shared.security.CustomUserDetail.CustomUserDetailsService;
 import com.oneClick.authService.shared.security.jwt.JwtAuthenticationEntryPoint;
-import com.oneClick.authService.shared.security.jwt.JwtAuthenticationFilter;
+import com.oneClick.authService.shared.util.PemUtils;
+import org.springframework.http.HttpMethod;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +20,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.security.interfaces.RSAPublicKey;
 
 @Configuration
 @EnableWebSecurity
@@ -29,20 +35,30 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtConfig jwtConfig;
+    private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthenticationEntryPoint authEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
-    private final CustomUserDetailsService customUserDetailsService;
-    private final JwtAuthenticationEntryPoint entryPoint;
+    private final CorsConfigurationSource corsConfigurationSource;
+
+//    @Bean
+//    public JwtDecoder jwtDecoder() {
+//        RSAPublicKey publicKey;
+//        try {
+//            publicKey = PemUtils.readPublicKeyFromFile("/app/keys/public.pem");
+//        } catch (Exception e) {
+//            throw new IllegalStateException("Cannot load RS256 public key", e);
+//        }
+//        return NimbusJwtDecoder.withPublicKey(publicKey).build();
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        log.info("Configuring Security Filter Chain...");
+        log.info("Configuring RS256 Security Filter Chain...");
 
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -50,71 +66,29 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
                 )
+                // ✅ RS256 NATIVE - THAY THẾ jwtAuthFilter
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .authorizeHttpRequests(auth -> auth
-                        // ============================================
-                        // PUBLIC ENDPOINTS (No authentication required)
-                        // ============================================
 
-                        // Actuator & Health
-                        .requestMatchers(
-                                "/actuator/health",
-                                "/actuator/info"
-                        ).permitAll()
+                        // PUBLIC (giữ nguyên)
+                        .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/verification/**").permitAll()
+                        .requestMatchers("/api/test/**", "/api/dev/**").permitAll()
 
-                        // API Documentation
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/api-docs/**",
-                                "/swagger-resources/**",
-                                "/webjars/**"
-                        ).permitAll()
-
-                        // Auth endpoints
-                        .requestMatchers(
-                                "/api/auth/register",
-                                "/api/auth/login",
-                                "/api/auth/refresh-token",
-                                "/api/auth/logout",
-                                "/api/auth/forgot-password",
-                                "/api/auth/reset-password",
-                                "/api/auth/verify-email"
-                        ).permitAll()
-
-                        // Verification endpoints
-                        .requestMatchers(
-                                "/api/verification/verify-email",
-                                "/api/verification/resend-email"
-                        ).permitAll()
-
-                        // OAuth endpoints
-                        .requestMatchers(
-                                "/api/auth/oauth/**"
-                        ).permitAll()
-
-                        // Test endpoints (ONLY for development)
-                        .requestMatchers(
-                                "/api/test/**",
-                                "/api/dev/**"
-                        ).permitAll()
-
-                        // ============================================
-                        // PROTECTED ENDPOINTS (Authentication required)
-                        // ============================================
-
-                        // Admin endpoints require ADMIN role
+                        // PROTECTED
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // All other requests require authentication
+                        // Expose public key for other service
+                        .requestMatchers("/oauth2/jwks").permitAll()
+
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint))
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider());  // Giữ DAO cho /auth/login
 
-        log.info("Security Filter Chain configured successfully");
-
+        log.info("RS256 Security Filter Chain configured");
         return http.build();
     }
 

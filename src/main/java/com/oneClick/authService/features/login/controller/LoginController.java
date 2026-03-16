@@ -25,9 +25,9 @@ public class LoginController {
     private final LoginHandler loginHandler;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest){
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse){
 
-        ApiResponse<LoginResponse> response = loginHandler.login(request,httpRequest);
+        ApiResponse<LoginResponse> response = loginHandler.login(request,httpRequest, httpResponse);
 
         log.debug("LoginController DEBUG - response.data.accountId = {}",
                 response.getData() != null ? response.getData().getAccountId() : "NULL DATA");

@@ -1,3 +1,4 @@
+/*
 package com.oneClick.authService.shared.security.jwt;
 
 import com.oneClick.authService.shared.security.CustomUserDetail.CustomUserDetailsService;
@@ -90,3 +91,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+*/
