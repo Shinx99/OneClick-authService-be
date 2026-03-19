@@ -2,6 +2,7 @@ package com.oneClick.authService.shared.config;
 
 import com.oneClick.authService.shared.security.CustomAccessDeniedHandler;
 import com.oneClick.authService.shared.security.CustomUserDetail.CustomUserDetailsService;
+import com.oneClick.authService.shared.security.internalApi.InternalApiKeyFilter;
 import com.oneClick.authService.shared.security.jwt.JwtAuthenticationEntryPoint;
 import com.oneClick.authService.shared.util.PemUtils;
 import org.springframework.http.HttpMethod;
@@ -40,6 +41,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint authEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final InternalApiKeyFilter internalApiKeyFilter;
 
 //    @Bean
 //    public JwtDecoder jwtDecoder() {
@@ -84,8 +86,12 @@ public class SecurityConfig {
                         // Expose public key for other service
                         .requestMatchers("/oauth2/jwks").permitAll()
 
+                        // Internal API path to communicate with recruitment service
+                        .requestMatchers("/api/internal/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(internalApiKeyFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(authenticationProvider());  // Giữ DAO cho /auth/login
 
         log.info("RS256 Security Filter Chain configured");
