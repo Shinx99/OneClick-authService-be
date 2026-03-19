@@ -124,6 +124,9 @@ services:
       - SPRINGDOC_SWAGGER_UI_ENABLED=true
       - SPRINGDOC_SWAGGER_UI_PATH=swagger-ui.html
 
+      # Internal Secret Key
+      - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
+
     depends_on:
       postgres:
         condition: service_healthy
