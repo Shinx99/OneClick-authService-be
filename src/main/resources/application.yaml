@@ -249,10 +249,6 @@ jwt:
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:36000000}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000}
   issuer: ${JWT_ISSUER:authService-be}
-#  secret: ${JWT_SECRET}
-#  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900000}
-#  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
-#  issuer: ${JWT_ISSUER:authService-be}
 
 # ============================================
 # SPRINGDOC / SWAGGER
