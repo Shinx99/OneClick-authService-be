@@ -60,7 +60,8 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                //.cors(cors -> cors.configurationSource(corsConfigurationSource)) <- Test for backend
+                .cors(cors -> cors.disable())   // <= Connect to FE
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -68,7 +69,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
                 )
-                // ✅ RS256 NATIVE - THAY THẾ jwtAuthFilter
+                // RS256 NATIVE - THAY THẾ jwtAuthFilter
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .authorizeHttpRequests(auth -> auth
 
