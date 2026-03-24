@@ -274,6 +274,20 @@ public class PasswordUtil {
     }
 
     /**
+     * Verify if the plain password matches the hashed password
+     */
+    public static boolean verifyPassword(String plainPassword, String hashedContext) {
+        if (plainPassword == null || hashedContext == null) {
+            return false;
+        }
+        try {
+            return BCrypt.checkpw(plainPassword, hashedContext);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * Hash BLAKE3
      */
 
