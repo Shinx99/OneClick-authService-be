@@ -65,4 +65,15 @@ public class Account {
                 .build();
     }
 
+    public boolean checkPassword(String plainPassword) {
+        // Kiểm tra nếu passwordCredential chưa được khởi tạo
+        if (this.passwordCredential == null || this.passwordCredential.getPasswordHash() == null) {
+            return false;
+        }
+
+        // Sử dụng PasswordUtil để so sánh mật khẩu thô với hash trong DB
+        // Giả định PasswordUtil của bạn có method verify hoặc matches
+        return PasswordUtil.verifyPassword(plainPassword, this.passwordCredential.getPasswordHash());
+    }
+
 }
