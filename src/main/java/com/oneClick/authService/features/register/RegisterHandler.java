@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -42,22 +44,25 @@ public class RegisterHandler {
             throw new BusinessException("Email already registered", HttpStatus.CONFLICT, "EMAIL_EXISTS");
         }
 
+        // 2. Find all roles from entity
+        Set<Role> roleEntities = new HashSet<>();
+        for(String roleName : request.roles()){
+            Role role = roleRepository.findByRoleName(roleName)
+                    .orElseThrow(() -> new BusinessException("Role '" + roleName + "' not found",
+                            HttpStatus.INTERNAL_SERVER_ERROR, "ROLE_NOT_FOUND"));
+            roleEntities.add(role);
+        }
+
         //2. Create account + PasswordCredential
         Account account = Account.builder()
                 .email(request.email().trim().toLowerCase())
                 .status("pending")
                 .phone(request.phone())
+                .roles(roleEntities)
                 .build();
 
         //set password
         account.setPasswordCredential(request.password());
-
-        //set role
-        Role candidateRole = roleRepository.findByRoleName("candidate")
-                .orElseThrow(()-> new BusinessException("Default role 'candidate' not found",
-                        HttpStatus.INTERNAL_SERVER_ERROR,"ROLE_NOT_FOUND"));
-
-        account.getRoles().add(candidateRole);
 
         account = accountRepository.save(account);
 
@@ -77,7 +82,6 @@ public class RegisterHandler {
 
         AuditContextHolder.setCurrentAccountId(account.getAccountId());
 
-
         //4. Send email 1: verify link
         emailService.sendVerificationEmail(
                 account.getEmail(),
@@ -88,6 +92,4 @@ public class RegisterHandler {
 
         return new RegisterResponse(account.getAccountId(), "Registration successful, please verify your email");
     }
-
-
 }
