@@ -92,8 +92,8 @@ public class LoginHandler {
         ResponseCookie responseCookie = ResponseCookie.from("refreshToken", rawRefreshToken)
                 .httpOnly(true)
                 .secure(secureCookie)
-                .sameSite("Lax")
-                .path("/")
+                .sameSite("Strict")
+                .path("/api/auth")
                 .maxAge(jwtTokenProvider.getRefreshTokenExpiry() / 1000)
                 .build();
         httpResponse.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
