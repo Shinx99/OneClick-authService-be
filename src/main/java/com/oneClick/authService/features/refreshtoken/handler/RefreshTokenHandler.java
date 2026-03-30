@@ -38,6 +38,7 @@ public class RefreshTokenHandler {
     @Transactional
     public ApiResponse<TokenRefreshResponse> refreshAccessToken(String rawRefreshToken, HttpServletResponse httpResponse){
 
+
         // 1. Hash refresh token from client then find in DB
         String tokenHash = tokenHashUtil.hash(rawRefreshToken);
 
@@ -59,7 +60,7 @@ public class RefreshTokenHandler {
 
         // 5. Rotate refresh token (delete old refresh token and create new refresh token)
         // Delete the old one
-        refreshTokenRepository.delete(refreshToken);
+        //refreshTokenRepository.delete(refreshToken);
 
         // Create the new one
         String newRawRefreshToken = jwtTokenProvider.generateRefreshToken(account.getAccountId().toString());
@@ -79,8 +80,8 @@ public class RefreshTokenHandler {
         ResponseCookie responseCookie = ResponseCookie.from("refreshToken", newRawRefreshToken)
                 .httpOnly(true)
                 .secure(secureCookie)
-                .sameSite("Strict")
-                .path("/api/auth")
+                .sameSite("Lax")
+                .path("/")
                 .maxAge(jwtTokenProvider.getRefreshTokenExpiry() / 1000)
                 .build();
         httpResponse.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
@@ -88,6 +89,10 @@ public class RefreshTokenHandler {
 
         // 8. Transfer data to DTO (TokenRefreshResponse)
         TokenRefreshResponse response = TokenRefreshResponse.builder()
+                .accountId(account.getAccountId())
+                .email(account.getEmail())
+                .roles(roles)
+                .status(account.getStatus())
                 .accessToken(newAccessToken)
                 .expiresIn(jwtTokenProvider.getAccessTokenExpiry())
                 .build();
