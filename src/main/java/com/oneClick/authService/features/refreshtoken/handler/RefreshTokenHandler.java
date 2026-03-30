@@ -60,7 +60,7 @@ public class RefreshTokenHandler {
 
         // 5. Rotate refresh token (delete old refresh token and create new refresh token)
         // Delete the old one
-        //refreshTokenRepository.delete(refreshToken);
+        refreshTokenRepository.delete(refreshToken);
 
         // Create the new one
         String newRawRefreshToken = jwtTokenProvider.generateRefreshToken(account.getAccountId().toString());
@@ -80,8 +80,8 @@ public class RefreshTokenHandler {
         ResponseCookie responseCookie = ResponseCookie.from("refreshToken", newRawRefreshToken)
                 .httpOnly(true)
                 .secure(secureCookie)
-                .sameSite("Lax")
-                .path("/")
+                .sameSite("Strict")
+                .path("/api/auth")
                 .maxAge(jwtTokenProvider.getRefreshTokenExpiry() / 1000)
                 .build();
         httpResponse.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());

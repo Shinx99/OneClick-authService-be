@@ -34,8 +34,6 @@ public class LoginController {
         log.debug("LoginController DEBUG - response.data.accountId = {}",
                 response.getData() != null ? response.getData().getAccountId() : "NULL DATA");
 
-/*        HttpSession session = httpRequest.getSession(true); //save accountId redis for auditLog
-        session.setAttribute("CURRENT_ACCOUNT_ID", response.getData().getAccountId());*/
         if(response != null && response.getData() != null && response.getData().getAccountId() != null){
             AuditContextHolder.setCurrentAccountId(response.getData().getAccountId());
             log.debug("LoginController set AuditContext accountId: {}", response.getData().getAccountId());
