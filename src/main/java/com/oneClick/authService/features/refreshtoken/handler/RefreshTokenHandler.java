@@ -38,6 +38,7 @@ public class RefreshTokenHandler {
     @Transactional
     public ApiResponse<TokenRefreshResponse> refreshAccessToken(String rawRefreshToken, HttpServletResponse httpResponse){
 
+
         // 1. Hash refresh token from client then find in DB
         String tokenHash = tokenHashUtil.hash(rawRefreshToken);
 
@@ -88,6 +89,10 @@ public class RefreshTokenHandler {
 
         // 8. Transfer data to DTO (TokenRefreshResponse)
         TokenRefreshResponse response = TokenRefreshResponse.builder()
+                .accountId(account.getAccountId())
+                .email(account.getEmail())
+                .roles(roles)
+                .status(account.getStatus())
                 .accessToken(newAccessToken)
                 .expiresIn(jwtTokenProvider.getAccessTokenExpiry())
                 .build();
