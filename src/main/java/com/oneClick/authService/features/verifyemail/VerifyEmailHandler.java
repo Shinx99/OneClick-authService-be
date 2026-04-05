@@ -17,9 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.Builder;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  // VerifyEmailHandler.handle()
@@ -74,8 +77,18 @@ public class VerifyEmailHandler {
 
         //AuditContextHolder.setCurrentAccountId(account.getAccountId());
 
-
-        return new VerifyEmailResponse(account.getAccountId(), "Email verified successfully");
+        return VerifyEmailResponse.builder()
+                .accountId(account.getAccountId())
+                .email(account.getEmail())
+                .phone(account.getPhone())
+                .status(account.getStatus())
+                .roles(account.getRoles() == null
+                        ? Set.of()
+                        : account.getRoles().stream()
+                        .map(role -> role.getRoleName())
+                        .collect(Collectors.toSet()))
+                .message("Email verified successfully")
+                .build();
     }
 
     public UUID getAccountIdByVerifyToken(String rawToken) {
