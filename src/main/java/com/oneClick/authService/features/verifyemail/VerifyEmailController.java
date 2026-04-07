@@ -36,11 +36,10 @@ public class VerifyEmailController {
        UUID accountId = verifyEmailHandler.getAccountIdByVerifyToken(token);
        if (accountId != null) {
            AuditContextHolder.setCurrentAccountId(accountId);
-           log.debug("🔥 VerifyEmail SET AuditContext EARLY: {}", accountId);
+           log.debug("VerifyEmail SET AuditContext EARLY: {}", accountId);
        }
 
        VerifyEmailResponse response = verifyEmailHandler.handle(request, ip, userAgent);
-
 
        return ResponseEntity.ok(response);
 
