@@ -36,7 +36,7 @@ JOIN (VALUES
     ('candidate1@example.com', crypt('Candidate@123', gen_salt('bf', 10)), 'bcrypt'),
     ('candidate2@example.com', crypt('Candidate@123', gen_salt('bf', 10)), 'bcrypt'),
     ('candidate3@example.com', crypt('Candidate@123', gen_salt('bf', 10)), 'bcrypt'),
-    ('recruiter0@example.com', crypt('Recruiter@123', gen_salt('bf', 10)), 'bcrypt')
+    ('recruiter0@example.com', crypt('docker', gen_salt('bf', 10)), 'bcrypt')
 ) AS v(email, password_hash, password_algo)
     ON v.email = a.email
 ON CONFLICT (account_id) DO UPDATE SET
