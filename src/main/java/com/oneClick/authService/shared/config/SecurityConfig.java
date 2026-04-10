@@ -23,6 +23,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -43,16 +45,29 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final InternalApiKeyFilter internalApiKeyFilter;
 
-//    @Bean
-//    public JwtDecoder jwtDecoder() {
-//        RSAPublicKey publicKey;
-//        try {
-//            publicKey = PemUtils.readPublicKeyFromFile("/app/keys/public.pem");
-//        } catch (Exception e) {
-//            throw new IllegalStateException("Cannot load RS256 public key", e);
-//        }
-//        return NimbusJwtDecoder.withPublicKey(publicKey).build();
-//    }
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        RSAPublicKey publicKey;
+        try {
+            publicKey = PemUtils.readPublicKeyFromFile("/app/keys/public.pem");
+        } catch (Exception e) {
+            throw new IllegalStateException("Cannot load RS256 public key", e);
+        }
+        return NimbusJwtDecoder.withPublicKey(publicKey).build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        // Đặt tên claim chứa danh sách quyền (ví dụ: "roles" hoặc "scope")
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        // Thêm tiền tố "ROLE_" vì hasRole("ADMIN") yêu cầu ROLE_ADMIN
+        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -70,7 +85,12 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 // RS256 NATIVE - THAY THẾ jwtAuthFilter
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .decoder(jwtDecoder())                     // Sử dụng decoder bean
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter()) // Sử dụng converter bean
+                        )
+                )
                 .authorizeHttpRequests(auth -> auth
 
                         // PUBLIC (giữ nguyên)
@@ -82,7 +102,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/test/**", "/api/dev/**").permitAll()
 
                         // PROTECTED
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_admin")
 
                         // Expose public key for other service
                         .requestMatchers("/oauth2/jwks").permitAll()
