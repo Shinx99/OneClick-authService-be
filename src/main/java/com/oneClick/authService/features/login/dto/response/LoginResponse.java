@@ -14,6 +14,7 @@ public class LoginResponse {
     private UUID accountId;
     private String status;
     private String email;
+    private String phone;
     private Boolean emailVerifiedAt;
     private List<String> roles;
 
