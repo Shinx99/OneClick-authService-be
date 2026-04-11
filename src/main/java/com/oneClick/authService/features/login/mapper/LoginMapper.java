@@ -17,6 +17,7 @@ public interface LoginMapper {
     @Mapping(target = "accountId", source = "account.accountId")
     @Mapping(target = "status", source = "account.status")
     @Mapping(target = "email", source = "account.email")
+    @Mapping(target = "phone", source = "account.phone")
     @Mapping(target = "emailVerifiedAt", ignore = true)
     @Mapping(target = "roles", source = "account.roles")
     @Mapping(target = "accessToken", source = "accessToken")
