@@ -8,7 +8,7 @@ This script automates the creation of Flyway SQL migration files within the Milk
 Set executable permissions to the script:
 
 ```bash
-chmod +x scripts/create-migration.sh
+chmod +x create-migration.sh
 ```
 ---
 ## 2. Usage Guide
@@ -18,7 +18,7 @@ chmod +x scripts/create-migration.sh
 - Run the script directly from the project root:
 
 ```bash
-./scripts/create-migration.sh
+./create-migration.sh
 ```
 ---
 ## Windows
