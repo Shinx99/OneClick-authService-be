@@ -36,4 +36,10 @@ public interface EmailVerificationTokenRepository extends JpaRepository<EmailVer
      */
     @Query("SELECT COUNT(t) FROM EmailVerificationToken t WHERE t.accountId = :accountId AND t.usedAt IS NULL")
     long countUnusedTokensByAccountId(@Param("accountId") UUID accountId);
+
+    Optional<EmailVerificationToken> findByAccountId(UUID accountId);
+
+    void deleteByAccountId(UUID accountId);
+
+
 }

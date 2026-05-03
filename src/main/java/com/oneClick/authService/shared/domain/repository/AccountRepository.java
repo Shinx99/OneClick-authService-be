@@ -20,4 +20,6 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     @Query("SELECT a FROM Account a JOIN FETCH a.roles WHERE a.email = :email")
     Optional<Account> findByEmailWithRole(String email);
 
+    Optional<Account> findByAccountId(UUID accountId);
+
 }
