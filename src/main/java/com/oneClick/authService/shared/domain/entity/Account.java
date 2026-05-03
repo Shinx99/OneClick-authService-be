@@ -65,6 +65,23 @@ public class Account {
                 .build();
     }
 
+    /**
+     * UPDATE password for EXISTING account
+     */
+    public void updatePassword(String plainPassword) {
+        if (this.passwordCredential == null) {
+            // Nếu chưa có, tạo mới
+            setPasswordCredential(plainPassword);
+        } else {
+            // Nếu đã có, update hash
+            this.passwordCredential.setPasswordHash(PasswordUtil.hashPassword(plainPassword));
+        }
+        // Cập nhật thời gian nếu cần (nếu có field passwordUpdatedAt)
+        if (this.passwordCredential.getPasswordUpdatedAt() != null) {
+            this.passwordCredential.setPasswordUpdatedAt(Instant.now());
+        }
+    }
+
     public boolean checkPassword(String plainPassword) {
         // Kiểm tra nếu passwordCredential chưa được khởi tạo
         if (this.passwordCredential == null || this.passwordCredential.getPasswordHash() == null) {
