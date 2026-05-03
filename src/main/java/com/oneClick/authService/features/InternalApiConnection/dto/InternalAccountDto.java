@@ -1,5 +1,6 @@
 package com.oneClick.authService.features.InternalApiConnection.dto;
 
+import com.oneClick.authService.shared.domain.entity.Account;
 import com.oneClick.authService.shared.domain.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,16 +20,20 @@ public class InternalAccountDto {
     private String email;
     private String phone;
     private String status;
-    private List<String> roles;
+    private Set<String> roles;
 
 
-    public InternalAccountDto(UUID accountId, String email, String phone, String status, Set<Role> roles) {
-        this.accountId = accountId;
-        this.email = email;
-        this.phone = phone;
-        this.status = status;
-        this.roles = roles.stream()
-                .map(Role::getRoleName)
-                .collect(Collectors.toList());
+    public static InternalAccountDto from(Account account) {
+        InternalAccountDto dto = new InternalAccountDto();
+        dto.setAccountId(account.getAccountId());
+        dto.setEmail(account.getEmail());
+        dto.setPhone(account.getPhone());
+        dto.setStatus(account.getStatus());
+        dto.setRoles(
+                account.getRoles().stream()
+                        .map(Role::getRoleName) // hoặc .map(Role::getName)
+                        .collect(Collectors.toSet())
+        );
+        return dto;
     }
 }
